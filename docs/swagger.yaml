@@ -1,5 +1,25 @@
 basePath: /
 definitions:
+  dto.AuthResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+    type: object
+  dto.AuthResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.AuthResponse'
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   dto.AuthTokensResponse:
     properties:
       access_token:
@@ -7,17 +27,42 @@ definitions:
       refresh_token:
         type: string
     type: object
+  dto.AuthTokensResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.AuthTokensResponse'
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   dto.AuthURLResponse:
     properties:
       auth_url:
         type: string
     type: object
-  dto.ErrorResponse:
+  dto.AuthURLResponseWrapper:
     properties:
-      error:
-        type: string
+      data:
+        $ref: '#/definitions/dto.AuthURLResponse'
       message:
+        example: Success message
         type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  dto.ErrorResponseWrapper:
+    properties:
+      errors: {}
+      message:
+        example: Error message
+        type: string
+      success:
+        example: false
+        type: boolean
     type: object
   dto.GoogleMobileLoginRequest:
     properties:
@@ -65,6 +110,19 @@ definitions:
         type: string
       name:
         type: string
+      role:
+        type: string
+    type: object
+  dto.UserResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UserResponse'
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
     type: object
 host: localhost:8080
 info:
@@ -93,19 +151,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.AuthTokensResponse'
+            $ref: '#/definitions/dto.AuthResponseWrapper'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
       summary: Google OAuth callback
       tags:
       - Auth
@@ -118,11 +176,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.AuthURLResponse'
+            $ref: '#/definitions/dto.AuthURLResponseWrapper'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
       summary: Get Google OAuth URL
       tags:
       - Auth
@@ -146,15 +204,15 @@ paths:
         "200":
           description: Berhasil login dengan Google (mobile)
           schema:
-            $ref: '#/definitions/dto.AuthTokensResponse'
+            $ref: '#/definitions/dto.AuthResponseWrapper'
         "400":
           description: Body request tidak valid
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
         "401":
           description: id_token Google tidak valid atau tidak bisa diverifikasi
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
       summary: Login dengan Google untuk aplikasi mobile (native)
       tags:
       - Auth
@@ -176,11 +234,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.AuthTokensResponse'
+            $ref: '#/definitions/dto.AuthResponseWrapper'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
       summary: Login user
       tags:
       - Auth
@@ -194,11 +252,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.UserResponse'
+            $ref: '#/definitions/dto.UserResponseWrapper'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
       security:
       - BearerAuth: []
       summary: Get data user yang sedang login
@@ -222,15 +280,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.AuthTokensResponse'
+            $ref: '#/definitions/dto.AuthTokensResponseWrapper'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
       summary: Refresh access token
       tags:
       - Auth
@@ -252,11 +310,11 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.AuthTokensResponse'
+            $ref: '#/definitions/dto.AuthResponseWrapper'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
       summary: Register user baru
       tags:
       - Auth

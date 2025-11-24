@@ -2,6 +2,12 @@ package entity
 
 import "time"
 
+const (
+	RoleAdmin  = "admin"
+	RoleStaff  = "staff"
+	RoleViewer = "viewer"
+)
+
 type User struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`

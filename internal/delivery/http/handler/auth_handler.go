@@ -7,6 +7,7 @@ import (
 
 	"go-zakat/internal/delivery/http/dto"
 	"go-zakat/internal/usecase"
+	"go-zakat/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,33 +27,33 @@ func NewAuthHandler(authUC *usecase.AuthUseCase) *AuthHandler {
 // @Accept json
 // @Produce json
 // @Param request body dto.RegisterRequest true "Register Request Body"
-// @Success 201 {object} dto.AuthTokensResponse
-// @Failure 400 {object} dto.ErrorResponse
+// @Success 201 {object} dto.AuthResponseWrapper
+// @Failure 400 {object} dto.ErrorResponseWrapper
 // @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "bad_request",
-			Message: err.Error(),
-		})
+		response.ValidationError(c, gin.H{"error": err.Error()})
 		return
 	}
 
-	tokens, err := h.authUC.Register(usecase.RegisterInput{
+	tokens, user, err := h.authUC.Register(usecase.RegisterInput{
 		Email:    req.Email,
 		Password: req.Password,
 		Name:     req.Name,
 	})
 	if err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "register_failed",
-			Message: err.Error(),
-		})
+		response.BadRequest(c, err.Error(), nil)
 		return
 	}
 
-	c.JSON(http.StatusCreated, dto.AuthTokensResponse{
+	response.Success(c, http.StatusCreated, "Register successful", dto.AuthResponse{
+		User: dto.UserResponse{
+			ID:    user.ID,
+			Email: user.Email,
+			Name:  user.Name,
+			Role:  user.Role,
+		},
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	})
@@ -65,32 +66,32 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body dto.LoginRequest true "Login Body"
-// @Success 200 {object} dto.AuthTokensResponse
-// @Failure 401 {object} dto.ErrorResponse
+// @Success 200 {object} dto.AuthResponseWrapper
+// @Failure 401 {object} dto.ErrorResponseWrapper
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "bad_request",
-			Message: err.Error(),
-		})
+		response.ValidationError(c, gin.H{"error": err.Error()})
 		return
 	}
 
-	tokens, err := h.authUC.Login(usecase.LoginInput{
+	tokens, user, err := h.authUC.Login(usecase.LoginInput{
 		Email:    req.Email,
 		Password: req.Password,
 	})
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error:   "login_failed",
-			Message: err.Error(),
-		})
+		response.Unauthorized(c, err.Error(), nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.AuthTokensResponse{
+	response.Success(c, http.StatusOK, "Login successful", dto.AuthResponse{
+		User: dto.UserResponse{
+			ID:    user.ID,
+			Email: user.Email,
+			Name:  user.Name,
+			Role:  user.Role,
+		},
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	})
@@ -102,34 +103,29 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Tags Auth
 // @Security BearerAuth
 // @Produce json
-// @Success 200 {object} dto.UserResponse
-// @Failure 401 {object} dto.ErrorResponse
+// @Success 200 {object} dto.UserResponseWrapper
+// @Failure 401 {object} dto.ErrorResponseWrapper
 // @Router /auth/me [get]
 func (h *AuthHandler) Me(c *gin.Context) {
 	userID, ok := c.Get("user_id")
 	if !ok {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error:   "unauthorized",
-			Message: "user_id tidak ditemukan di context",
-		})
+		response.Unauthorized(c, "user_id tidak ditemukan di context", nil)
 		return
 	}
 
 	// Ambil user dari UseCase
 	user, err := h.authUC.GetUserByID(userID.(string))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error:   "not_found",
-			Message: "User tidak ditemukan",
-		})
+		response.Unauthorized(c, "User tidak ditemukan", nil)
 		return
 	}
 
 	// Mapping ke response DTO
-	c.JSON(http.StatusOK, dto.UserResponse{
+	response.Success(c, http.StatusOK, "Get user successful", dto.UserResponse{
 		ID:    user.ID,
 		Email: user.Email,
 		Name:  user.Name,
+		Role:  user.Role,
 	})
 }
 
@@ -140,31 +136,25 @@ func (h *AuthHandler) Me(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body dto.RefreshTokenRequest true "Refresh Token Body"
-// @Success 200 {object} dto.AuthTokensResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 401 {object} dto.ErrorResponse
+// @Success 200 {object} dto.AuthTokensResponseWrapper
+// @Failure 400 {object} dto.ErrorResponseWrapper
+// @Failure 401 {object} dto.ErrorResponseWrapper
 // @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *gin.Context) {
 	var req dto.RefreshTokenRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "bad_request",
-			Message: err.Error(),
-		})
+		response.ValidationError(c, gin.H{"error": err.Error()})
 		return
 	}
 
 	tokens, err := h.authUC.RefreshToken(req.RefreshToken)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error:   "invalid_refresh_token",
-			Message: err.Error(),
-		})
+		response.Unauthorized(c, err.Error(), nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.AuthTokensResponse{
+	response.Success(c, http.StatusOK, "Refresh token successful", dto.AuthTokensResponse{
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	})
@@ -175,17 +165,14 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 // @Description Mengembalikan URL untuk redirect user ke Google OAuth
 // @Tags Auth
 // @Produce json
-// @Success 200 {object} dto.AuthURLResponse
-// @Failure 500 {object} dto.ErrorResponse
+// @Success 200 {object} dto.AuthURLResponseWrapper
+// @Failure 500 {object} dto.ErrorResponseWrapper
 // @Router /auth/google/login [get]
 func (h *AuthHandler) GoogleLogin(c *gin.Context) {
 	// 1. Generate state random
 	state, err := generateState()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "internal_error",
-			Message: "gagal generate state",
-		})
+		response.InternalServerError(c, "gagal generate state", nil)
 		return
 	}
 
@@ -196,10 +183,7 @@ func (h *AuthHandler) GoogleLogin(c *gin.Context) {
 	// 3. Minta URL ke UseCase
 	authURL, err := h.authUC.GoogleLogin(state)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "internal_error",
-			Message: err.Error(),
-		})
+		response.InternalServerError(c, err.Error(), nil)
 		return
 	}
 
@@ -207,7 +191,7 @@ func (h *AuthHandler) GoogleLogin(c *gin.Context) {
 	// c.Redirect(http.StatusFound, authURL); return
 
 	// Untuk demo/frontend, enak dikirim JSON
-	c.JSON(http.StatusOK, dto.AuthURLResponse{
+	response.Success(c, http.StatusOK, "Get Google login URL successful", dto.AuthURLResponse{
 		AuthURL: authURL,
 	})
 }
@@ -219,10 +203,10 @@ func (h *AuthHandler) GoogleLogin(c *gin.Context) {
 // @Produce json
 // @Param code query string true "Kode authorization dari Google"
 // @Param state query string true "State untuk CSRF protection"
-// @Success 200 {object} dto.AuthTokensResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 401 {object} dto.ErrorResponse
-// @Failure 500 {object} dto.ErrorResponse
+// @Success 200 {object} dto.AuthResponseWrapper
+// @Failure 400 {object} dto.ErrorResponseWrapper
+// @Failure 401 {object} dto.ErrorResponseWrapper
+// @Failure 500 {object} dto.ErrorResponseWrapper
 // @Router /auth/google/callback [get]
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	// 1. Ambil code & state dari query
@@ -230,35 +214,32 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	state := c.Query("state")
 
 	if code == "" || state == "" {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "bad_request",
-			Message: "code atau state kosong",
-		})
+		response.BadRequest(c, "code atau state kosong", nil)
 		return
 	}
 
 	// 2. Ambil expectedState dari cookie
 	expectedState, err := c.Cookie("oauth_state")
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error:   "unauthorized",
-			Message: "state cookie tidak ditemukan",
-		})
+		response.Unauthorized(c, "state cookie tidak ditemukan", nil)
 		return
 	}
 
 	// 3. Panggil UseCase
-	tokens, err := h.authUC.GoogleCallback(state, expectedState, code)
+	tokens, user, err := h.authUC.GoogleCallback(state, expectedState, code)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error:   "google_auth_failed",
-			Message: err.Error(),
-		})
+		response.Unauthorized(c, err.Error(), nil)
 		return
 	}
 
 	// 4. Beres, balikin token
-	c.JSON(http.StatusOK, dto.AuthTokensResponse{
+	response.Success(c, http.StatusOK, "Google login successful", dto.AuthResponse{
+		User: dto.UserResponse{
+			ID:    user.ID,
+			Email: user.Email,
+			Name:  user.Name,
+			Role:  user.Role,
+		},
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	})
@@ -271,30 +252,30 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body dto.GoogleMobileLoginRequest true "Body berisi id_token dari Google"
-// @Success 200 {object} dto.AuthTokensResponse "Berhasil login dengan Google (mobile)"
-// @Failure 400 {object} dto.ErrorResponse "Body request tidak valid"
-// @Failure 401 {object} dto.ErrorResponse "id_token Google tidak valid atau tidak bisa diverifikasi"
+// @Success 200 {object} dto.AuthResponseWrapper "Berhasil login dengan Google (mobile)"
+// @Failure 400 {object} dto.ErrorResponseWrapper "Body request tidak valid"
+// @Failure 401 {object} dto.ErrorResponseWrapper "id_token Google tidak valid atau tidak bisa diverifikasi"
 // @Router /auth/google/mobile/login [post]
 func (h *AuthHandler) GoogleMobileLogin(c *gin.Context) {
 	var req dto.GoogleMobileLoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "invalid_body",
-			Message: err.Error(),
-		})
+		response.ValidationError(c, gin.H{"error": err.Error()})
 		return
 	}
 
-	tokens, err := h.authUC.GoogleMobileLogin(req.IDToken)
+	tokens, user, err := h.authUC.GoogleMobileLogin(req.IDToken)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error:   "google_login_failed",
-			Message: err.Error(),
-		})
+		response.Unauthorized(c, err.Error(), nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.AuthTokensResponse{
+	response.Success(c, http.StatusOK, "Google mobile login successful", dto.AuthResponse{
+		User: dto.UserResponse{
+			ID:    user.ID,
+			Email: user.Email,
+			Name:  user.Name,
+			Role:  user.Role,
+		},
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	})

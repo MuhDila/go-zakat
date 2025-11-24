@@ -4,6 +4,8 @@
     <file url="file://$PROJECT_DIR$/internal/repository/postgres/user_repository.go" value="eb03ca50-0194-469b-be83-2d662fb7c37e" />
     <file url="file://$PROJECT_DIR$/migrations/000001_create_users_table.down.sql" value="eb03ca50-0194-469b-be83-2d662fb7c37e" />
     <file url="file://$PROJECT_DIR$/migrations/000001_create_users_table.up.sql" value="eb03ca50-0194-469b-be83-2d662fb7c37e" />
+    <file url="file://$PROJECT_DIR$/migrations/000002_add_role_to_users_table.down.sql" value="eb03ca50-0194-469b-be83-2d662fb7c37e" />
+    <file url="file://$PROJECT_DIR$/migrations/000002_add_role_to_users_table.up.sql" value="eb03ca50-0194-469b-be83-2d662fb7c37e" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/eb03ca50-0194-469b-be83-2d662fb7c37e/console.sql" value="eb03ca50-0194-469b-be83-2d662fb7c37e" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/eb03ca50-0194-469b-be83-2d662fb7c37e/console_1.sql" value="eb03ca50-0194-469b-be83-2d662fb7c37e" />
   </component>

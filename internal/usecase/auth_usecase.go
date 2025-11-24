@@ -54,24 +54,24 @@ type AuthTokens struct {
 }
 
 // Register melakukan proses register user baru
-func (uc *AuthUseCase) Register(input RegisterInput) (*AuthTokens, error) {
+func (uc *AuthUseCase) Register(input RegisterInput) (*AuthTokens, *entity.User, error) {
 	// 1. Validasi input pakai validator
 	if err := uc.validator.Struct(input); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// 2. Cek apakah email sudah digunakan
 	_, err := uc.userRepo.FindByEmail(input.Email)
 	if err == nil {
 		// kalau tidak error artinya user ada
-		return nil, errors.New("email sudah terdaftar")
+		return nil, nil, errors.New("email sudah terdaftar")
 	}
 	// NOTE: di implementasi nyata kamu bedakan error "not found" vs error lain
 
 	// 3. Hash password
 	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), 10)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// 4. Buat entity User
@@ -79,58 +79,59 @@ func (uc *AuthUseCase) Register(input RegisterInput) (*AuthTokens, error) {
 		Email:    input.Email,
 		Password: string(hashed),
 		Name:     input.Name,
+		Role:     entity.RoleViewer, // Default role
 	}
 
 	// 5. Simpan ke DB via UserRepository
 	if err := uc.userRepo.Create(user); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// 6. Generate access token & refresh token
 	access, err := uc.tokenSvc.GenerateAccessToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	refresh, err := uc.tokenSvc.GenerateRefreshToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	return &AuthTokens{
 		AccessToken:  access,
 		RefreshToken: refresh,
-	}, nil
+	}, user, nil
 }
 
 // Login melakukan proses login
-func (uc *AuthUseCase) Login(input LoginInput) (*AuthTokens, error) {
+func (uc *AuthUseCase) Login(input LoginInput) (*AuthTokens, *entity.User, error) {
 	if err := uc.validator.Struct(input); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	user, err := uc.userRepo.FindByEmail(input.Email)
 	if err != nil {
-		return nil, errors.New("email atau password salah")
+		return nil, nil, errors.New("email atau password salah")
 	}
 
 	// compare password plaintext dengan hash
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-		return nil, errors.New("email atau password salah")
+		return nil, nil, errors.New("email atau password salah")
 	}
 
 	access, err := uc.tokenSvc.GenerateAccessToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	refresh, err := uc.tokenSvc.GenerateRefreshToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	return &AuthTokens{
 		AccessToken:  access,
 		RefreshToken: refresh,
-	}, nil
+	}, user, nil
 }
 
 // GoogleLogin hanya mengembalikan URL untuk redirect (web)
@@ -140,22 +141,22 @@ func (uc *AuthUseCase) GoogleLogin(state string) (string, error) {
 }
 
 // GoogleCallback memproses code dari Google dan generate token
-func (uc *AuthUseCase) GoogleCallback(state, expectedState, code string) (*AuthTokens, error) {
+func (uc *AuthUseCase) GoogleCallback(state, expectedState, code string) (*AuthTokens, *entity.User, error) {
 	// 1. Validasi state (CSRF protection)
 	if state != expectedState {
-		return nil, errors.New("state tidak valid")
+		return nil, nil, errors.New("state tidak valid")
 	}
 
 	// 2. Tukar code dengan access token
 	accessToken, err := uc.googleSvc.ExchangeCode(code)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// 3. Ambil user info dari Google
 	email, name, googleID, err := uc.googleSvc.GetUserInfo(accessToken)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// 4. Cek apakah user dengan google_id sudah ada
@@ -165,28 +166,29 @@ func (uc *AuthUseCase) GoogleCallback(state, expectedState, code string) (*AuthT
 		user = &entity.User{
 			Email: email,
 			Name:  name,
+			Role:  entity.RoleViewer, // Default role
 		}
 		user.GoogleID = &googleID
 
 		if err := uc.userRepo.Create(user); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
 	// 5. Generate token
 	access, err := uc.tokenSvc.GenerateAccessToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	refresh, err := uc.tokenSvc.GenerateRefreshToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	return &AuthTokens{
 		AccessToken:  access,
 		RefreshToken: refresh,
-	}, nil
+	}, user, nil
 }
 
 // RefreshToken : validasi refresh token → buat access token baru
@@ -216,10 +218,10 @@ func (uc *AuthUseCase) GetUserByID(userID string) (*entity.User, error) {
 	return user, nil
 }
 
-func (uc *AuthUseCase) GoogleMobileLogin(idToken string) (*AuthTokens, error) {
+func (uc *AuthUseCase) GoogleMobileLogin(idToken string) (*AuthTokens, *entity.User, error) {
 	email, name, googleID, err := uc.googleSvc.VerifyMobileIDToken(idToken)
 	if err != nil {
-		return nil, fmt.Errorf("invalid_google_token")
+		return nil, nil, fmt.Errorf("invalid_google_token")
 	}
 
 	user, err := uc.userRepo.FindByGoogleID(googleID)
@@ -229,25 +231,26 @@ func (uc *AuthUseCase) GoogleMobileLogin(idToken string) (*AuthTokens, error) {
 			Email:    email,
 			Name:     name,
 			GoogleID: &googleID,
+			Role:     entity.RoleViewer, // Default role
 		}
 		if err := uc.userRepo.Create(newUser); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		user = newUser
 	}
 
 	access, err := uc.tokenSvc.GenerateAccessToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	refresh, err := uc.tokenSvc.GenerateRefreshToken(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	return &AuthTokens{
 		AccessToken:  access,
 		RefreshToken: refresh,
-	}, nil
+	}, user, nil
 }

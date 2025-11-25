@@ -35,6 +35,16 @@ type MuzakkiListResponseWrapper struct {
 	Data interface{} `json:"data"` // Contains pagination data
 }
 
+type AsnafResponseWrapper struct {
+	ResponseSuccess
+	Data AsnafResponse `json:"data"`
+}
+
+type AsnafListResponseWrapper struct {
+	ResponseSuccess
+	Data interface{} `json:"data"` // Contains pagination data
+}
+
 type ErrorResponseWrapper struct {
 	Success bool        `json:"success" example:"false"`
 	Message string      `json:"message" example:"Error message"`

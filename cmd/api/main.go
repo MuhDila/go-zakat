@@ -89,6 +89,11 @@ func main() {
 	muzakkiUC := usecase.NewMuzakkiUseCase(muzakkiRepo, val)
 	muzakkiHandler := handler.NewMuzakkiHandler(muzakkiUC)
 
+	// Asnaf dependencies
+	asnafRepo := postgres.NewAsnafRepository(dbPool, logr)
+	asnafUC := usecase.NewAsnafUseCase(asnafRepo, val)
+	asnafHandler := handler.NewAsnafHandler(asnafUC)
+
 	// Middleware
 	authMiddleware := middleware.NewAuthMiddleware(tokenSvc)
 
@@ -138,6 +143,17 @@ func main() {
 			muzakki.POST("", muzakkiHandler.Create)
 			muzakki.PUT("/:id", muzakkiHandler.Update)
 			muzakki.DELETE("/:id", muzakkiHandler.Delete)
+		}
+
+		// Asnaf routes (protected)
+		asnaf := v1.Group("/asnaf")
+		asnaf.Use(authMiddleware.RequireAuth())
+		{
+			asnaf.GET("", asnafHandler.FindAll)
+			asnaf.GET("/:id", asnafHandler.FindByID)
+			asnaf.POST("", asnafHandler.Create)
+			asnaf.PUT("/:id", asnafHandler.Update)
+			asnaf.DELETE("/:id", asnafHandler.Delete)
 		}
 	}
 

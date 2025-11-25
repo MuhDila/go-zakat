@@ -1,5 +1,40 @@
 basePath: /
 definitions:
+  dto.AsnafListResponseWrapper:
+    properties:
+      data:
+        description: Contains pagination data
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  dto.AsnafResponse:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  dto.AsnafResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.AsnafResponse'
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   dto.AuthResponse:
     properties:
       access_token:
@@ -53,6 +88,15 @@ definitions:
       success:
         example: true
         type: boolean
+    type: object
+  dto.CreateAsnafRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
     type: object
   dto.CreateMuzakkiRequest:
     properties:
@@ -165,6 +209,15 @@ definitions:
         example: true
         type: boolean
     type: object
+  dto.UpdateAsnafRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
   dto.UpdateMuzakkiRequest:
     properties:
       address:
@@ -209,6 +262,168 @@ info:
   title: Auth API
   version: "1.0"
 paths:
+  /api/v1/asnaf:
+    get:
+      description: Get list of asnaf with pagination and search
+      parameters:
+      - description: Search by name
+        in: query
+        name: q
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AsnafListResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get all asnaf
+      tags:
+      - Asnaf
+    post:
+      consumes:
+      - application/json
+      description: Create a new asnaf record
+      parameters:
+      - description: Create Asnaf Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAsnafRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.AsnafResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Create new asnaf
+      tags:
+      - Asnaf
+  /api/v1/asnaf/{id}:
+    delete:
+      description: Delete an asnaf record
+      parameters:
+      - description: Asnaf ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Delete asnaf
+      tags:
+      - Asnaf
+    get:
+      description: Get a single asnaf record by ID
+      parameters:
+      - description: Asnaf ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AsnafResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get asnaf by ID
+      tags:
+      - Asnaf
+    put:
+      consumes:
+      - application/json
+      description: Update an existing asnaf record
+      parameters:
+      - description: Asnaf ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Asnaf Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAsnafRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AsnafResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Update asnaf
+      tags:
+      - Asnaf
   /api/v1/auth/google/callback:
     get:
       description: Callback endpoint yang dipanggil oleh Google setelah user login

@@ -35,7 +35,7 @@ func (r *MuzakkiRepository) FindAll(filter repository.MuzakkiFilter) ([]*entity.
 	// Filter by query (name or phone number)
 	if filter.Query != "" {
 		search := fmt.Sprintf("%%%s%%", filter.Query)
-		condition := fmt.Sprintf(" AND (name ILIKE $%d OR phoneNumber ILIKE $%d)", argIdx, argIdx+1)
+		condition := fmt.Sprintf(" WHERE (name ILIKE $%d OR phoneNumber ILIKE $%d)", argIdx, argIdx+1)
 		query += condition
 		countQuery += condition
 		args = append(args, search, search)

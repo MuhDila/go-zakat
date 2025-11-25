@@ -552,6 +552,272 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/mustahiq": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get list of mustahiq with pagination, search, and status filter",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mustahiq"
+                ],
+                "summary": "Get all mustahiq",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search by name or address",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status: active, inactive, pending",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by asnaf ID",
+                        "name": "asnafID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Items per page",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MustahiqListResponseWrapper"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new mustahiq record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mustahiq"
+                ],
+                "summary": "Create new mustahiq",
+                "parameters": [
+                    {
+                        "description": "Create Mustahiq Request Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateMustahiqRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MustahiqResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/mustahiq/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a single mustahiq record by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mustahiq"
+                ],
+                "summary": "Get mustahiq by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mustahiq ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MustahiqResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing mustahiq record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mustahiq"
+                ],
+                "summary": "Update mustahiq",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mustahiq ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Mustahiq Request Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateMustahiqRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MustahiqResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a mustahiq record",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Mustahiq"
+                ],
+                "summary": "Delete mustahiq",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mustahiq ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseSuccess"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponseWrapper"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/muzakki": {
             "get": {
                 "security": [
@@ -808,6 +1074,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.AsnafInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.AsnafListResponseWrapper": {
             "type": "object",
             "properties": {
@@ -955,6 +1232,41 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateMustahiqRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "asnafID",
+                "name",
+                "phoneNumber",
+                "status"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "asnafID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "inactive",
+                        "pending"
+                    ]
+                }
+            }
+        },
         "dto.CreateMuzakkiRequest": {
             "type": "object",
             "required": [
@@ -1014,6 +1326,70 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.MustahiqListResponseWrapper": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Contains pagination data"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Success message"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.MustahiqResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "asnaf": {
+                    "$ref": "#/definitions/dto.AsnafInfo"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MustahiqResponseWrapper": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.MustahiqResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Success message"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -1130,6 +1506,41 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.UpdateMustahiqRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "asnafID",
+                "name",
+                "phoneNumber",
+                "status"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "asnafID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "inactive",
+                        "pending"
+                    ]
                 }
             }
         },

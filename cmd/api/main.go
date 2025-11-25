@@ -94,6 +94,11 @@ func main() {
 	asnafUC := usecase.NewAsnafUseCase(asnafRepo, val)
 	asnafHandler := handler.NewAsnafHandler(asnafUC)
 
+	// Mustahiq dependencies
+	mustahiqRepo := postgres.NewMustahiqRepository(dbPool, logr)
+	mustahiqUC := usecase.NewMustahiqUseCase(mustahiqRepo, val)
+	mustahiqHandler := handler.NewMustahiqHandler(mustahiqUC)
+
 	// Middleware
 	authMiddleware := middleware.NewAuthMiddleware(tokenSvc)
 
@@ -154,6 +159,17 @@ func main() {
 			asnaf.POST("", asnafHandler.Create)
 			asnaf.PUT("/:id", asnafHandler.Update)
 			asnaf.DELETE("/:id", asnafHandler.Delete)
+		}
+
+		// Mustahiq routes (protected)
+		mustahiq := v1.Group("/mustahiq")
+		mustahiq.Use(authMiddleware.RequireAuth())
+		{
+			mustahiq.GET("", mustahiqHandler.FindAll)
+			mustahiq.GET("/:id", mustahiqHandler.FindByID)
+			mustahiq.POST("", mustahiqHandler.Create)
+			mustahiq.PUT("/:id", mustahiqHandler.Update)
+			mustahiq.DELETE("/:id", mustahiqHandler.Delete)
 		}
 	}
 

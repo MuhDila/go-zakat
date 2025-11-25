@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  dto.AsnafInfo:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   dto.AsnafListResponseWrapper:
     properties:
       data:
@@ -98,6 +105,31 @@ definitions:
     required:
     - name
     type: object
+  dto.CreateMustahiqRequest:
+    properties:
+      address:
+        type: string
+      asnafID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      phoneNumber:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - pending
+        type: string
+    required:
+    - address
+    - asnafID
+    - name
+    - phoneNumber
+    - status
+    type: object
   dto.CreateMuzakkiRequest:
     properties:
       address:
@@ -139,6 +171,49 @@ definitions:
     required:
     - email
     - password
+    type: object
+  dto.MustahiqListResponseWrapper:
+    properties:
+      data:
+        description: Contains pagination data
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  dto.MustahiqResponse:
+    properties:
+      address:
+        type: string
+      asnaf:
+        $ref: '#/definitions/dto.AsnafInfo'
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phoneNumber:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  dto.MustahiqResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.MustahiqResponse'
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
     type: object
   dto.MuzakkiListResponseWrapper:
     properties:
@@ -217,6 +292,31 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  dto.UpdateMustahiqRequest:
+    properties:
+      address:
+        type: string
+      asnafID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      phoneNumber:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - pending
+        type: string
+    required:
+    - address
+    - asnafID
+    - name
+    - phoneNumber
+    - status
     type: object
   dto.UpdateMuzakkiRequest:
     properties:
@@ -611,6 +711,176 @@ paths:
       summary: Register user baru
       tags:
       - Auth
+  /api/v1/mustahiq:
+    get:
+      description: Get list of mustahiq with pagination, search, and status filter
+      parameters:
+      - description: Search by name or address
+        in: query
+        name: q
+        type: string
+      - description: 'Filter by status: active, inactive, pending'
+        in: query
+        name: status
+        type: string
+      - description: Filter by asnaf ID
+        in: query
+        name: asnafID
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MustahiqListResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get all mustahiq
+      tags:
+      - Mustahiq
+    post:
+      consumes:
+      - application/json
+      description: Create a new mustahiq record
+      parameters:
+      - description: Create Mustahiq Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateMustahiqRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.MustahiqResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Create new mustahiq
+      tags:
+      - Mustahiq
+  /api/v1/mustahiq/{id}:
+    delete:
+      description: Delete a mustahiq record
+      parameters:
+      - description: Mustahiq ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Delete mustahiq
+      tags:
+      - Mustahiq
+    get:
+      description: Get a single mustahiq record by ID
+      parameters:
+      - description: Mustahiq ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MustahiqResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get mustahiq by ID
+      tags:
+      - Mustahiq
+    put:
+      consumes:
+      - application/json
+      description: Update an existing mustahiq record
+      parameters:
+      - description: Mustahiq ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Mustahiq Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateMustahiqRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MustahiqResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Update mustahiq
+      tags:
+      - Mustahiq
   /api/v1/muzakki:
     get:
       description: Get list of muzakki with pagination and search

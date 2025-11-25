@@ -45,6 +45,16 @@ type AsnafListResponseWrapper struct {
 	Data interface{} `json:"data"` // Contains pagination data
 }
 
+type MustahiqResponseWrapper struct {
+	ResponseSuccess
+	Data MustahiqResponse `json:"data"`
+}
+
+type MustahiqListResponseWrapper struct {
+	ResponseSuccess
+	Data interface{} `json:"data"` // Contains pagination data
+}
+
 type ErrorResponseWrapper struct {
 	Success bool        `json:"success" example:"false"`
 	Message string      `json:"message" example:"Error message"`

@@ -85,6 +85,11 @@ type DistributionListResponseWrapper struct {
 	Data interface{} `json:"data"` // Contains pagination data
 }
 
+type ReportResponseWrapper struct {
+	ResponseSuccess
+	Data interface{} `json:"data"` // Generic for all reports
+}
+
 type ErrorResponseWrapper struct {
 	Success bool        `json:"success" example:"false"`
 	Message string      `json:"message" example:"Error message"`

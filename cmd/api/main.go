@@ -114,6 +114,11 @@ func main() {
 	distributionUC := usecase.NewDistributionUseCase(distributionRepo, mustahiqRepo, val)
 	distributionHandler := handler.NewDistributionHandler(distributionUC)
 
+	// Report dependencies
+	reportRepo := postgres.NewReportRepository(dbPool, logr)
+	reportUC := usecase.NewReportUseCase(reportRepo, val)
+	reportHandler := handler.NewReportHandler(reportUC)
+
 	// Middleware
 	authMiddleware := middleware.NewAuthMiddleware(tokenSvc)
 
@@ -218,6 +223,16 @@ func main() {
 			distributions.POST("", distributionHandler.Create)
 			distributions.PUT("/:id", distributionHandler.Update)
 			distributions.DELETE("/:id", distributionHandler.Delete)
+		}
+
+		// Report routes (protected, read-only)
+		reports := v1.Group("/reports")
+		reports.Use(authMiddleware.RequireAuth())
+		{
+			reports.GET("/income-summary", reportHandler.GetIncomeSummary)
+			reports.GET("/distribution-summary", reportHandler.GetDistributionSummary)
+			reports.GET("/fund-balance", reportHandler.GetFundBalance)
+			reports.GET("/mustahiq-history/:mustahiq_id", reportHandler.GetMustahiqHistory)
 		}
 	}
 

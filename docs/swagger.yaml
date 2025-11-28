@@ -561,6 +561,17 @@ definitions:
     - name
     - password
     type: object
+  dto.ReportResponseWrapper:
+    properties:
+      data:
+        description: Generic for all reports
+      message:
+        example: Success message
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   dto.ResponseSuccess:
     properties:
       message:
@@ -1934,6 +1945,146 @@ paths:
       summary: Update program
       tags:
       - Program
+  /api/v1/reports/distribution-summary:
+    get:
+      description: Get distribution summary grouped by asnaf or program
+      parameters:
+      - description: Filter by date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - description: 'Group by: asnaf, program'
+        in: query
+        name: group_by
+        required: true
+        type: string
+      - description: Filter by source fund type
+        in: query
+        name: source_fund_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ReportResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get distribution summary report
+      tags:
+      - Reports
+  /api/v1/reports/fund-balance:
+    get:
+      description: Get fund balance showing total in, total out, and balance for each
+        fund type
+      parameters:
+      - description: Filter by date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ReportResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get fund balance report
+      tags:
+      - Reports
+  /api/v1/reports/income-summary:
+    get:
+      description: Get income summary grouped by period with breakdown by fund type
+      parameters:
+      - description: Filter by date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: monthly
+        description: 'Group by: daily, monthly'
+        in: query
+        name: group_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ReportResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get income summary report
+      tags:
+      - Reports
+  /api/v1/reports/mustahiq-history/{mustahiq_id}:
+    get:
+      description: Get distribution history for a specific mustahiq
+      parameters:
+      - description: Mustahiq ID
+        in: path
+        name: mustahiq_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ReportResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponseWrapper'
+      security:
+      - BearerAuth: []
+      summary: Get mustahiq history report
+      tags:
+      - Reports
 securityDefinitions:
   BearerAuth:
     in: header

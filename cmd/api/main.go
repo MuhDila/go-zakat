@@ -12,7 +12,7 @@ package main
 import (
 	"context"
 	"errors"
-	"go-zakat/pkg/logger"
+	"go-zakat-be/pkg/logger"
 	"net/http"
 	"os"
 	"os/signal"
@@ -25,18 +25,18 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"go-zakat/docs"
+	"go-zakat-be/docs"
 
-	"go-zakat/internal/delivery/http/handler"
-	"go-zakat/internal/delivery/http/middleware"
-	domainValidator "go-zakat/internal/delivery/http/validator"
-	"go-zakat/internal/infrastructure/jwt"
-	"go-zakat/internal/infrastructure/oauth"
-	"go-zakat/internal/repository/postgres"
-	"go-zakat/internal/usecase"
+	"go-zakat-be/internal/delivery/http/handler"
+	"go-zakat-be/internal/delivery/http/middleware"
+	domainValidator "go-zakat-be/internal/delivery/http/validator"
+	"go-zakat-be/internal/infrastructure/jwt"
+	"go-zakat-be/internal/infrastructure/oauth"
+	"go-zakat-be/internal/repository/postgres"
+	"go-zakat-be/internal/usecase"
 
-	"go-zakat/pkg/config"
-	"go-zakat/pkg/database"
+	"go-zakat-be/pkg/config"
+	"go-zakat-be/pkg/database"
 )
 
 func main() {

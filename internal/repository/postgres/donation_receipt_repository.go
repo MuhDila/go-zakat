@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"go-zakat/internal/domain/entity"
-	"go-zakat/internal/domain/repository"
+	"go-zakat-be/internal/domain/entity"
+	"go-zakat-be/internal/domain/repository"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sirupsen/logrus"

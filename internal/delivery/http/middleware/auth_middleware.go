@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"go-zakat/internal/domain/service"
+	"go-zakat-be/internal/domain/service"
 
 	"github.com/gin-gonic/gin"
 )

@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"go-zakat/internal/delivery/http/dto"
-	"go-zakat/internal/usecase"
-	"go-zakat/pkg/response"
+	"go-zakat-be/internal/delivery/http/dto"
+	"go-zakat-be/internal/usecase"
+	"go-zakat-be/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )

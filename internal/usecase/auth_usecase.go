@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"go-zakat/internal/domain/entity"
-	"go-zakat/internal/domain/repository"
-	"go-zakat/internal/domain/service"
+	"go-zakat-be/internal/domain/entity"
+	"go-zakat-be/internal/domain/repository"
+	"go-zakat-be/internal/domain/service"
 
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"

@@ -1,6 +1,6 @@
 package repository
 
-import "go-zakat/internal/domain/entity"
+import "go-zakat-be/internal/domain/entity"
 
 type UserFilter struct {
 	Query   string // Search in name or email

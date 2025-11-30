@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"go-zakat/internal/delivery/http/dto"
-	"go-zakat/internal/domain/repository"
-	"go-zakat/internal/usecase"
-	"go-zakat/pkg/response"
+	"go-zakat-be/internal/delivery/http/dto"
+	"go-zakat-be/internal/domain/repository"
+	"go-zakat-be/internal/usecase"
+	"go-zakat-be/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )

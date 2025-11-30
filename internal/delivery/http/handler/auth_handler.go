@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"go-zakat/internal/delivery/http/dto"
-	"go-zakat/internal/infrastructure/oauth"
-	"go-zakat/internal/usecase"
-	"go-zakat/pkg/response"
+	"go-zakat-be/internal/delivery/http/dto"
+	"go-zakat-be/internal/infrastructure/oauth"
+	"go-zakat-be/internal/usecase"
+	"go-zakat-be/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )

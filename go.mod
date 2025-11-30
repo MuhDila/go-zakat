@@ -1,4 +1,4 @@
-module go-zakat
+module go-zakat-be
 
 go 1.25
 

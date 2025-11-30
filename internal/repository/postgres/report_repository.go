@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"go-zakat/internal/domain/repository"
+	"go-zakat-be/internal/domain/repository"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sirupsen/logrus"

@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"errors"
-	"go-zakat/internal/domain/entity"
-	"go-zakat/internal/domain/repository"
+	"go-zakat-be/internal/domain/entity"
+	"go-zakat-be/internal/domain/repository"
 
 	"github.com/go-playground/validator/v10"
 )

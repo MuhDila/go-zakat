@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+
+# Build output
+main
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Dependencies
+vendor/
+
+# Environment variables
+.env
+
+# IDEs
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+docker-compose.yml

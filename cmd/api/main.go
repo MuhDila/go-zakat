@@ -87,7 +87,7 @@ func main() {
 	// Auth dependencies
 	userRepo := postgres.NewUserRepository(dbPool, logr)
 	authUC := usecase.NewAuthUseCase(userRepo, tokenSvc, googleSvc, val)
-	authHandler := handler.NewAuthHandler(authUC, stateStore)
+	authHandler := handler.NewAuthHandler(authUC, stateStore, cfg.FrontendURL)
 
 	// Muzakki dependencies
 	muzakkiRepo := postgres.NewMuzakkiRepository(dbPool, logr)

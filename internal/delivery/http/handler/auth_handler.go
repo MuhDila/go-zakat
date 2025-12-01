@@ -15,14 +15,16 @@ import (
 )
 
 type AuthHandler struct {
-	authUC     *usecase.AuthUseCase
-	stateStore *oauth.StateStore
+	authUC      *usecase.AuthUseCase
+	stateStore  *oauth.StateStore
+	frontendURL string
 }
 
-func NewAuthHandler(authUC *usecase.AuthUseCase, stateStore *oauth.StateStore) *AuthHandler {
+func NewAuthHandler(authUC *usecase.AuthUseCase, stateStore *oauth.StateStore, frontendURL string) *AuthHandler {
 	return &AuthHandler{
-		authUC:     authUC,
-		stateStore: stateStore,
+		authUC:      authUC,
+		stateStore:  stateStore,
+		frontendURL: frontendURL,
 	}
 }
 
@@ -208,7 +210,7 @@ func (h *AuthHandler) GoogleLogin(c *gin.Context) {
 // @Produce json
 // @Param code query string true "Kode authorization dari Google"
 // @Param state query string true "State untuk CSRF protection"
-// @Success 200 {object} dto.AuthResponseWrapper
+// @Success 302 "Redirect to frontend with tokens"
 // @Failure 400 {object} dto.ErrorResponseWrapper
 // @Failure 401 {object} dto.ErrorResponseWrapper
 // @Failure 500 {object} dto.ErrorResponseWrapper
@@ -236,17 +238,15 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	// 4. Beres, balikin token
-	response.Success(c, http.StatusOK, "Google login successful", dto.AuthResponse{
-		User: dto.UserResponse{
-			ID:    user.ID,
-			Email: user.Email,
-			Name:  user.Name,
-			Role:  user.Role,
-		},
-		AccessToken:  tokens.AccessToken,
-		RefreshToken: tokens.RefreshToken,
-	})
+	// 4. Redirect ke frontend dengan tokens di query params
+	redirectURL := h.frontendURL + "/dashboard?access_token=" + tokens.AccessToken +
+		"&refresh_token=" + tokens.RefreshToken +
+		"&user_id=" + user.ID +
+		"&user_name=" + user.Name +
+		"&user_email=" + user.Email +
+		"&user_role=" + user.Role
+
+	c.Redirect(http.StatusFound, redirectURL)
 }
 
 // GoogleMobileLogin godoc

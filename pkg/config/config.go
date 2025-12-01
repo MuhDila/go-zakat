@@ -24,6 +24,8 @@ type AppConfig struct {
 	GoogleClientSecret string
 	GoogleRedirectURL  string
 
+	FrontendURL string
+
 	CORSAllowedOrigins []string
 }
 
@@ -41,6 +43,8 @@ func Load() *AppConfig {
 		GoogleClientID:     mustGet("GOOGLE_CLIENT_ID"),
 		GoogleClientSecret: mustGet("GOOGLE_CLIENT_SECRET"),
 		GoogleRedirectURL:  mustGet("GOOGLE_REDIRECT_URL"),
+
+		FrontendURL: getEnv("FRONTEND_URL", "http://localhost:3000"),
 
 		CORSAllowedOrigins: split(getEnv("CORS_ALLOWED_ORIGINS", "")),
 	}

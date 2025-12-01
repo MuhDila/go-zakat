@@ -38,7 +38,7 @@ RESTful API untuk sistem manajemen Zakat, Infaq, dan Sadaqah (ZIS) yang dibangun
 - Search by name
 - Pagination support
 - 8 kategori sesuai syariat Islam:
-    - Fakir, Miskin, Amil, Muallaf, Riqab, Gharimin, Fisabilillah, Ibnu Sabil
+  - Fakir, Miskin, Amil, Muallaf, Riqab, Gharimin, Fisabilillah, Ibnu Sabil
 
 **Mustahiq (Penerima Zakat/Beneficiaries)**
 - Full CRUD operations
@@ -138,7 +138,7 @@ RESTful API untuk sistem manajemen Zakat, Infaq, dan Sadaqah (ZIS) yang dibangun
    ```bash
    cp .env_example .env
    ```
-
+   
    Edit `.env` file:
    ```env
    # Server
@@ -177,14 +177,6 @@ RESTful API untuk sistem manajemen Zakat, Infaq, dan Sadaqah (ZIS) yang dibangun
    ```
 
    Server akan berjalan di `http://localhost:8080`
-
-
-6. **(Recomended) Run the applicationby docker**
-    ```bash
-   docker-compose up --build
-   ```
-
-   Server akan berjalan di `http://localhost:8080` by Docker
 
 ## 📚 API Documentation
 
